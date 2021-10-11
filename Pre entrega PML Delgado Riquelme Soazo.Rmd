@@ -13,7 +13,7 @@ library(readxl)
 
 
 ```{r}
-load("C:/RProjects/MG ESTADISTICA/MODELOS LINEALES/PROYECTO/ELSOC_2016.RData")
+load("ELSOC_2016.RData")
 elsoc_2016 <-sjmisc::set_na(elsoc_2016,na=c(-888,-999))
 ```
 
