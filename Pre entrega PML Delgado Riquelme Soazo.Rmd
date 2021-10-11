@@ -1,0 +1,69 @@
+---
+title: "Pre-entrega Proyecto Modelos Lineales"
+author: "Carlos Delgado G."
+date: "11-10-2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE,warning=FALSE)
+library(tidyverse)
+library(readxl)
+```
+
+
+```{r}
+load("C:/RProjects/MG ESTADISTICA/MODELOS LINEALES/PROYECTO/ELSOC_2016.RData")
+elsoc_2016 <-sjmisc::set_na(elsoc_2016,na=c(-888,-999))
+```
+
+# I.- Descripción del problema
+
+### Sobre Salud Mental en Chile
+
+### Sobre ELSOC y su Diseño Muestral
+
+El estudio longitudinal social de Chile (ELSOC), es una encuesta desarrollada para "analizar intertemporalmente la evolución del conflicto y cohesión en la sociedad chilena", que busca  "Constituirse en un insumo empírico para la comprensión de las creencias, actitudes y percepciones de los chilenos hacia las distintas dimensiones de la convivencia y el conflicto y cómo éstas cambian a lo larfo del tiempo". Como tal la encuesta fue diseñada investigadores pertenencientes al Centro de Estudios de Conflicto y Cohesión Social (COES), centro patrocinado por la Universidad de Chile y la Pontificia Universidad Católica de Chile, además de instituciones asociadas a la Universidad Diego Portales y la Universidad Adolfo Ibáñez. El levantamiento de los datos estuvo a cargo del Centro de Micro Datos de la Universidad de Chile. Esta encuesta, fue aplicada en el año 2016 mediante un cuestionario estructurado que fue aplicado cara a cara a todos los participantes.
+
+La Población Objetivo del estudio son hombres y mujeres de 18 a 75 años, residentes habituales de viviendas particulares ocupadas, localizadas en 40 ciudades (92 comunas) del país. El Diseño muestral es probabilístico, estratificado, por conglomerados y multietápico. Primero se eligen ciudades, luego manzanas, y subbloques y viviendas. La base de datos final cuenta con 2927 observaciones y 428 variables.
+
+El cuestionario de ELSOC cuenta con 7 secciones que a su vez albergan múltiples baterías de preguntas: Territorio, Redes y Actidudes Sociales, Ciudadanía y Democracia, Legitimidad y Desigualdad, Conflicto Social, Sociodemográfica y Salud y Bienestar. Esta última se encarga de cuestiones de satisfacción vital, estresores, prolemas de salud recientes, consumo de sustancias y estado de ánimo. Particularmente interesante es la escala de sintomatología depresiva que se incorpora dentro de la sección de Salud y Bienestar. 
+
+El "Patient Health Questionnaire" o PHQ-9 es un instrumento elaborado a nivel internacional para evaluar el estado de salud mental de los entrevistados La idea principal es evaluar la freuencia de síntomas de depresión. Las preguntas son respondidas en una escala autoadministrada que va desde "Nunca", "Algunos Días", "Más de la mitad de los días", "Casi todos los días", "Todos los Días". A partir de las respuestas a una batería de nueve preguntas, se recodifican las respuestas para cada pregunta en una escala de 0 a 3 y el puntaje final es la suma de todas las preguntas, resultando en un único puntaje que va desde 0 a 27.
+
+
+### Planteamiento metodológico del problema
+
+De esta forma nuestra pregunta de investigación será : ¿ Cuáles son los factores socioeconómicos y actitudinales que inciden de manera significativa en el puntaje PHQ-9 de los encuestados del estudio ELSOC?
+
+# II.- Análisis Descriptivo
+
+### Sobre la variable Respuesta:
+
+```{r}
+elsoc_2016$s11_01_rec <- car::recode(elsoc_2016$s11_01-1,"4=3")
+elsoc_2016$s11_02_rec <- car::recode(elsoc_2016$s11_02-1,"4=3")
+elsoc_2016$s11_03_rec <- car::recode(elsoc_2016$s11_03-1,"4=3")
+elsoc_2016$s11_04_rec <- car::recode(elsoc_2016$s11_04-1,"4=3")
+elsoc_2016$s11_05_rec <- car::recode(elsoc_2016$s11_05-1,"4=3")
+elsoc_2016$s11_06_rec <- car::recode(elsoc_2016$s11_06-1,"4=3")
+elsoc_2016$s11_07_rec <- car::recode(elsoc_2016$s11_07-1,"4=3")
+elsoc_2016$s11_08_rec <- car::recode(elsoc_2016$s11_08-1,"4=3")
+elsoc_2016$s11_09_rec <- car::recode(elsoc_2016$s11_09-1,"4=3")
+
+elsoc_2016$s11_phq9<- with(elsoc_2016,(s11_01_rec+s11_02_rec+s11_03_rec+s11_04_rec+s11_05_rec+s11_06_rec+s11_07_rec+s11_08_rec+s11_09_rec))
+```
+
+```{r}
+ggplot(elsoc_2016,aes(x=s11_phq9))+
+  geom_bar()+
+  labs(title = "Escala de sintomatología depresiva",
+       x="Puntaje PHQ-9",
+       y="Densidad")+
+  theme_classic()
+```
+
+Lo primero a distinguir es que la variable toma números enteros, partiendo desde cero. Podemos ver que no es una variable simétrica, con un peak en torno al cero, y luego otro en torno al valor 4. Esto lleva a considerar transformaciones de la variable respuesta, para obtener una mayor simetría.
+
+
+# III.- Selección de Modelos
